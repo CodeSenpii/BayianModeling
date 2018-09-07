@@ -1,0 +1,6 @@
+---
+title: "abm week2"
+author: "kwon"
+date: "2018년 9월 7일"
+output: html_document
+---
