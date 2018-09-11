@@ -4,6 +4,103 @@ author: "kwon"
 date: "2018년 9월 11일"
 output: html_document
 ---
+Two students took multiple 40 questions test, where each question has four choices.
+
+
+## 1. The parameters of interest
+theta1: true probability the first student will answer a question correctly /
+theta2:true probability the second student will answer a question correctly /
+
+## 2. Likelihood
+Binomial(40, theta), assuming each question is independent
+
+## 3. Prior
+Conjugate prior is a beta prior.
+```{r}
+theta = seq(from=0, to=1, by=0.01)
+plot(theta, dbeta(theta,1,1), type="l")
+plot(theta, dbeta(theta,4,2), type="l")
+plot(theta, dbeta(theta,8,4), type="l")
+
+```
+
+## 4. Prior probability
+```{r}
+1-pbeta(.25, 8, 4)
+1-pbeta(.5, 8, 4)
+1-pbeta(.8, 8, 4)
+
+```
+
+## 5. First student gets 33 questions right. What is posterior distirbution for theta1? P(theta1>.25)?
+Beta(8+33, 4+40-33) = Beta(41, 11)
+```{r}
+# posterior mean
+41/ (41+11)
+# mle
+33/40
+
+# prior
+plot(theta, dbeta(theta,8,4), type="l", ylim=c(0, 8))
+# posterior
+lines(theta, dbeta(theta, 44,11), lty=2)
+# likelihood
+lines(theta, dbinom(33, size= 40, p=theta), lty=3)
+lines(theta, 44*dbinom(33, size= 40, p=theta), lty=3)
+```
+
+Posterior Probability
+```{r}
+1-pbeta(.25, 41, 11)
+1-pbeta(.5, 41, 11)
+1-pbeta(.8, 41, 11)
+```
+
+## 6. Second student gets 24 questions right, what is the posterior distiribution?
+```{r}
+# Beta(8+24, 4+40-24) = Beta(32,20)
+32/(32+20)
+24/40
+
+# prior
+plot(theta, dbeta(theta,8,4), type="l", ylim=c(0, 6))
+# posterior
+lines(theta, dbeta(theta, 32,20), lty=2)
+# likelihood
+lines(theta, 44*dbinom(24, size= 40, p=theta), lty=3)
+
+
+1-pbeta(.25, 32, 20)
+1-pbeta(.5, 32, 20)
+1-pbeta(.8, 32, 20)
+```
+
+## 7. Estimate by simulation: draw 1000 samples from each and see how often we observe theta1 > theta2
+
+```{r}
+theta1= rbeta(1000, 41, 11)
+theta2= rbeta(1000, 32, 20)
+mean(theta1> theta2)
+```
+```{r}
+plot(y, y*dgamma(y, 9, 390), type="l")
+qgamma(c(0.05, 0.975), 9 ,390)
+
+alpha=9
+beta=390
+y = 80:120
+plot(y, dnorm(y, 96.17, 0.042), type="l")
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
