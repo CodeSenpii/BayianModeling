@@ -1,0 +1,17 @@
+---
+title: "Bayesian Statistics L7"
+author: "kwon"
+date: "2018년 9월 11일"
+output: html_document
+---
+
+
+
+
+
+
+
+
+
+
+
