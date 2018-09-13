@@ -4,3 +4,25 @@ author: "kwon"
 date: "2018년 9월 7일"
 output: html_document
 ---
+
+```{r}
+n = 200
+y_mean = 2172
+mu0 = 1875
+sigma0 = 160
+sigma1= 200
+
+mun = ((1/sigma0^2)*mu0+(n/sigma1^2)*y_mean)/(1/sigma0^2 +n/sigma1^2)
+sigman = 1/(1/sigma0^2 + n/sigma1^2)
+mun
+sqrt(sigman)
+1/sigman
+mun-1.96*sqrt(sigman)
+mun+1.96*sqrt(sigman)
+```
+
+```{r}
+theta = seq(0, 100, 0.1)
+plot(theta, 1/theta^2, type="l")
+
+```
