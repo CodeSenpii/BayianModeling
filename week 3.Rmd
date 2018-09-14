@@ -1,0 +1,54 @@
+---
+title: "week3"
+author: "kwon"
+date: "2018년 9월 13일"
+output: html_document
+---
+
+# Week3
+## Hierarchical MOdel
+
+```{r}
+d = read.table("rattumor.txt", header=TRUE)
+head(d)
+summary(d)
+```
+```{r}
+with(d, hist(y/N, freq=FALSE, xlim=c(0,1)))
+```
+
+## JAGS model specification
+```{r}
+model {
+  for (j in length(y)){
+    y[j] ~dbin(theta[j], N[j])
+    theta[j]~ dbeta(alpha, beta)
+  }
+  
+  alpha ~ dexp(0.001)
+  beta ~ dexp(0.001)
+}
+
+library("rjags")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
