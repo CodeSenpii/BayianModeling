@@ -8,39 +8,50 @@ output: html_document
 # Week3
 ## Hierarchical MOdel
 
-```{r}
+```{r exploration}
 d = read.table("rattumor.txt", header=TRUE)
 head(d)
 summary(d)
 ```
-```{r}
+```{r histogram}
 with(d, hist(y/N, freq=FALSE, xlim=c(0,1)))
 ```
 
 ## JAGS model specification
-```{r}
-model {
-  for (j in length(y)){
-    y[j] ~dbin(theta[j], N[j])
-    theta[j]~ dbeta(alpha, beta)
-  }
-  
-  alpha ~ dexp(0.001)
-  beta ~ dexp(0.001)
-}
-
-library("rjags")
+```{r JAGS}
+require(rjags)
+m<- jags.model("rattumor1.bug", d)
 ```
 
+```{r}
+# First run it for many iteartions until it becomes reliable
+update(m, 2500) # burn-in
 
+# Then run it for many more iterations, storing samples from selected nodes
+x <- coda.samples(m, c("alpha", "beta"), n.iter=10000)
+```
+Now x is a special object containing posterior samples of $\alpha$ and $\beta$.
 
+```{r}
+head(x)
 
+head(as.matrix(x))
+```
 
+```{r analysis}
+summary(x)
+```
+1:3500 are adpatation. \
+## First block
+Naive SE(Not using), Time-series SE: How much the approximate mean is different from true mean. \
+## Second block
+Represent Quantiles of variables. 50% are posterior median.
 
-
-
-
-
+## Summary
+$$ E(\alpha | y) \approx 3.4 $$
+$$ \sqrt{var(\alpha|y)} \approx 1.4 $$
+$$ E(\beta | y) \approx 20 $$
+$$ \sqrt{var(\beta|y)} \approx 8 $$
 
 
 
