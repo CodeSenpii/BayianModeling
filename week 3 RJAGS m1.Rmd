@@ -53,13 +53,20 @@ $$ \sqrt{var(\alpha|y)} \approx 1.4 $$
 $$ E(\beta | y) \approx 20 $$
 $$ \sqrt{var(\beta|y)} \approx 8 $$
 
+```{r posterior density}
+require(lattice)
+densityplot(x)
+```
 
+```{r joint posterior distribution}
+alpha =as.matrix(x)[,"alpha"]
+beta =as.matrix(x)[,"beta"]
+plot(alpha, beta, pch=".", cex=2)
+```
 
-
-
-
-
-
+```{r log sclaed graph}
+plot(log(alpha/beta), log(alpha+beta), pch=".", cex=2)
+```
 
 
 

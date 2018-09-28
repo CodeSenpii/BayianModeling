@@ -1,0 +1,48 @@
+---
+title: "week 3 RJAGS m2"
+author: "kwon"
+date: "2018년 9월 27일"
+output: html_document
+---
+
+```{r}
+d = read.table("rattumor.txt", header=TRUE)
+
+require(rjags)
+m<- jags.model("rattumor2.bug", d)
+
+update(m, 2500) 
+x <- coda.samples(m, c("alpha", "beta"), n.iter=10000)
+```
+Certain specification triggers errors.\
+- make hyperprior on $\phi_2$ more informative\
+phi2 ~ dunif(0, 10)\
+- Truncate the beta distribution away from its problematic endpoints: \
+theta[j] ~ dbeta(alpha, beta) T(0.0001, 0.9999)\
+- Turn off the sampler causing the problem
+```{r sampler off}
+set.factory("bugs::BinomSlice", "sampler", FALSE)
+
+m<- jags.model("rattumor2.bug", d)
+
+update(m, 2500) 
+x <- coda.samples(m, c("alpha", "beta"), n.iter=10000)
+```
+
+```{r}
+alpha <- as.matrix(x)[,"alpha"]
+beta <- as.matrix(x)[,"beta"]
+plot(log(alpha/beta), log(alpha+beta), pch=".", cex=2)
+```
+
+```{r contour plot of joint}
+library(MASS)
+contour(kde2d(log(alpha/beta), log(alpha+beta)))
+```
+## Posterior Predictive Distribution
+```{r}
+thetatilde <- rbeta(10000, alpha, beta)
+with(d, hist(y/N), freq=FALSE, main="", xlim=c(0,1) )
+hist(thetatilde, freq=FALSE, density=10, col="blue",border="blue", add=TRUE)
+```
+
