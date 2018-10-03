@@ -26,3 +26,12 @@ theta = seq(0, 100, 0.1)
 plot(theta, 1/theta^2, type="l")
 
 ```
+
+# Non-informative prior analysis
+```{r}
+
+```
+
+
+
+
