@@ -26,6 +26,7 @@ m<- jags.model("rattumor1.bug", d)
 
 ```{r}
 # First run it for many iteartions until it becomes reliable
+# None of the samples will be used. Discard.
 update(m, 2500) # burn-in
 
 # Then run it for many more iterations, storing samples from selected nodes
@@ -40,11 +41,12 @@ head(as.matrix(x))
 ```
 
 ```{r analysis}
+# 2500 iterations, and 1000 adaptations
 summary(x)
 ```
 1:3500 are adpatation. \
 ## First block
-Naive SE(Not using), Time-series SE: How much the approximate mean is different from true mean. \
+Naive SE(Not using), Time-series SE(Standard Error for Mean): How much the approximate mean is different from true mean. \
 ## Second block
 Represent Quantiles of variables. 50% are posterior median.
 
@@ -56,6 +58,8 @@ $$ \sqrt{var(\beta|y)} \approx 8 $$
 
 ```{r posterior density}
 require(lattice)
+
+# Posterior marginal distribution
 densityplot(x)
 ```
 
@@ -64,10 +68,13 @@ alpha =as.matrix(x)[,"alpha"]
 beta =as.matrix(x)[,"beta"]
 plot(alpha, beta, pch=".", cex=2)
 ```
+The plot indicates high correlation.
 
 ```{r log sclaed graph}
 plot(log(alpha/beta), log(alpha+beta), pch=".", cex=2)
 ```
-
+A lot less correlation between variables.\
+Were exponential hyperiors diffuse enough?\
+Try different priors.
 
 
