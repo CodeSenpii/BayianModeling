@@ -1,0 +1,10 @@
+---
+title: "week 9"
+author: "kwon"
+date: "2018년 10월 28일"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
