@@ -6,5 +6,27 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/tony/Documents/MCS/STAT 578 Advanced Bayesian Modeling/code files")
 ```
+
+```{r}
+Flintdata = read.table("flint-data-simple.csv", header=T, sep="\t")
+n = nrow(Flintdata)
+ybar = mean(log(Flintdata))
+s.2 = var(log(Flintdata))
+```
+
+```{r}
+post.sigma.2.sim = (n-1)*s.2/rchisq(1000, n-1)
+post.mu.sim = rnorm(1000, ybar, sqrt(post.sigma.2.sim/n))
+```
+
+
+
+
+
+
+
+
+
+
