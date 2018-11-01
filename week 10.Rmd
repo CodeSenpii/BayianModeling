@@ -6,5 +6,51 @@ output: pdf_document
 ---
 
 ```{r setup}
-knitr::opts_chunk$set(echo = TRUE)
+Election = seq(1952, 2004, 4)
+IncumbentPct = c(44.6, 57.8, 49.9, 61.3, 49.6, 61.8, 49.0, 44.7, 59.2, 53.9, 46.5, 54.7, 50.3, 51.2)
+IncomeGrowth = c(2.4, 2.9, 0.8, 4.2, 3.0, 3.6, 1.1, -0.4, 3.9, 2.3, 0.4, 1.0, 2.4, 1.9)
+
+bp =data.frame(Election, IncumbentPct, IncomeGrowth)
 ```
+
+## Classical lm
+```{r}
+mod = lm(IncumbentPct~IncomeGrowth, data=bp)
+
+(X = model.matrix(mod))
+betahat = coef(mod)
+smod=summary(mod)
+s.2 = smod$sigma^2
+Vbeta = smod$cov.unscaled
+n.minus.k = df.residual(mod)
+```
+
+## Posterior Simulation
+```{r posterior simulation}
+library(MASS)
+Nsim = 1000
+post.sigma.2.sim = n.minus.k*s.2/rchisq(Nsim, n.minus.k)
+
+post.beta.sim = matrix(NA, Nsim, length(betahat))
+for(s in 1:Nsim)
+  post.beta.sim[s,] = mvrnorm(1, betahat, post.sigma.2.sim[s]*Vbeta)
+```
+
+```{r}
+# posterior interval
+quantile(post.sigma.2.sim, c(0.025, 0.975))
+
+apply(post.beta.sim, 2, quantile, c(0.025, 0.975))
+
+confint(mod)
+```
+
+
+
+
+
+
+
+
+
+
