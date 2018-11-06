@@ -71,13 +71,16 @@ error.std.sim = matrix(NA, Nsim, nrow(bp))
 for(s in 1:Nsim)
   error.std.sim[s,] = (bp$IncumbentPct - X %*% cbind(post.beta.sim[s,])) / sqrt(post.sigma.2.sim[s])
 
+# rnorm can be used as it is standardized and independent
 ref.std.normal = matrix(rnorm(Nsim*nrow(bp)), Nsim, nrow(bp))
 ```
 
 ## Test quantitiy
 Checking for outliers
 ```{r}
-mean(apply(abs(ref.std.normal),1, max) >= apply(abs(error.std.sim), 1, max))
+max.t.rep = apply(abs(ref.std.normal),1, max)
+max.t.sim = apply(abs(error.std.sim), 1, max)
+mean(max.t.rep >= max.t.sim)
 ```
 
 
