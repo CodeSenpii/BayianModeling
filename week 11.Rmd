@@ -1,0 +1,69 @@
+---
+title: "week11"
+author: "kwon"
+date: "2018년 11월 7일"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+d = read.table("polls2016.txt", header=T)
+d$sigma = d$ME/2 # standard dev
+```
+
+## hierarchical model
+$$ y_j |\theta_j \sim N(\theta_j, \sigma^2_j) $$
+$$ \theta_j | \mu,\tau \sim N(\mu, \tau^2) $$
+$$ \mu \sim flat\ on (-\infty, \infty) $$
+$$ \tau \sim flat\ on (0, \infty) $$
+
+## Alternative 1
+No Pooling($\tau -> \infty$)
+$$ \theta_j \sim flat\ on (-\infty, \infty) $$
+
+\
+Complete Pooling($\tau=0$)
+$$ \mu \sim flat\ on (-\infty, \infty) $$
+
+### Full model
+```{r full model}
+require(rjags)
+m = jags.model("polls2016dic.bug", d, n.chains=2)
+update(m,2500)
+load.module("dic")
+
+x= coda.samples(m, c("theta", "deviance"), n.iter=100000)
+
+sx = summary(x)
+```
+
+### approximate deviance evaluated at posterior mean, and the posterior mean and variance of the deviance
+```{r}
+theta.means = sx$statistics[paste("theta[",1:nrow(d),"]", sep=""), "Mean"]
+
+deviance.Bayes = -2*sum(dnorm(d$y, theta.means, d$sigma, log=T))
+
+deviance.mean = sx$statistics["deviance", "Mean"]
+
+deviance.var =sx$statistics["deviance", "SD"]^2
+```
+
+### compute Pdic, Pdic alt
+```{r}
+(pDIC = -deviance.Bayes+deviance.mean)
+
+(pDICalt = 0.5*deviance.var)
+
+(DIC = deviance.Bayes+2*pDIC)
+```
+
+### No Pooling Model
+```{r no pooling}
+
+```
+
+
+
+
+
+
+
