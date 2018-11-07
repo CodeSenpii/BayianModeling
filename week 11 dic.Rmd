@@ -1,5 +1,5 @@
 ---
-title: "week11"
+title: "week11 dic"
 author: "kwon"
 date: "2018년 11월 7일"
 output: html_document
@@ -54,13 +54,12 @@ deviance.var =sx$statistics["deviance", "SD"]^2
 (pDICalt = 0.5*deviance.var)
 
 (DIC = deviance.Bayes+2*pDIC)
+(DICalt = deviance.Bayes+2*pDICalt)
 ```
 
-### No Pooling Model
-```{r no pooling}
-
+```{r}
+dic.samples(m, 100000)
 ```
-
 
 
 

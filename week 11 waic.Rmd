@@ -1,0 +1,50 @@
+---
+title: "week11 waic"
+author: "kwon"
+date: "2018년 11월 7일"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+d = read.table("polls2016.txt", header=T)
+d$sigma = d$ME/2 # standard dev
+require(rjags)
+```
+
+### Full model
+```{r full model}
+m = jags.model("polls2016waic.bug", d)
+update(m,2500)
+
+x= coda.samples(m, c("p.y", "log.p.y"), n.iter=100000)
+
+sx = summary(x)
+```
+
+### approximate values of predictive density
+```{r}
+p.y.means = sx$statistics[paste("p.y[",1:nrow(d),"]", sep=""), "Mean"]
+
+log.p.y.means = sx$statistics[paste("log.p.y[",1:nrow(d),"]", sep=""), "Mean"]
+
+log.p.y.vars = sx$statistics[paste("log.p.y[",1:nrow(d),"]", sep=""), "SD"]^2
+
+lppd = sum(log(p.y.means))
+```
+
+### compute pWAIC1, pWAIC2
+```{r}
+(pWAIC1 = 2*sum(log(p.y.means)-log.p.y.means))
+  
+(pWAIC2 = sum(log.p.y.vars))
+(WAIC1 = -2*lppd+2*pWAIC1)
+(WAIC2 = -2*lppd+2*pWAIC2)
+```
+
+Effective number of paramers for WAIC is only half of what it was for DIC
+
+
+
+
+
+
