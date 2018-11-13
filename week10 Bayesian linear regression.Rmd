@@ -5,12 +5,84 @@ date: "2018년 11월 13일"
 output: pdf_document
 ---
 
+# Classical lm
+
 ```{r setup, include=FALSE}
 require("cars")
+require("rjags")
 data("Leinhardt")
 ```
 
 ## investigate marginal relationship
 ```{r}
 pairs(Leinhardt)
+plot(infant ~ income, data= Leinhardt)
+hist(Leinhardt$infant)
+hist(Leinhardt$income)
+```
+Non-linear relations between infant and income, while both are right skwed.(log)
+
+## variable log transform
+```{r}
+Leinhardt$loginfant = log(Leinhardt$infant)
+Leinhardt$logincome = log(Leinhardt$income)
+```
+
+## modeling
+```{r}
+lmod = lm(loginfant~logincome, data=Leinhardt)
+summary(lmod)
+dat = na.omit(Leinhardt)
+```
+
+# Bayesian LM
+## modeling
+```{r jags}
+# model specification
+mod1_string = "model {
+  for(i in 1:n){
+    y[i] ~ dnorm(mu[i], prec)
+    mu[i] = b[1]+b[2]*log_income[i]
+  }
+  
+  for(j in 1:2){
+    b[j]~ dnorm(0.0, 1.0/1.0e6)
+  }
+  
+  prec ~ dgamma(5.0/2.0, 5.0*10.0/2.0)
+  sig2 = 1.0 / prec
+  sig = sqrt(sig2)
+}"
+
+# model creation
+set.seed(92)
+data1_jags = list(y=dat$logincome, n =nrow(dat), log_income=dat$logincome)
+params1 = c("b", "sig")
+inits1= function(){
+  inits = list("b"=rnorm(2, 0.0, 100.0), "prec"=rgamma(n=1, shape=1.0, rate=1.0))
+}
+
+mod1 = jags.model(textConnection(mod1_string), data=data1_jags, inits = inits1, n.chains = 3)
+update(mod1, 1000)
+```
+
+## Simulation
+```{r sim}
+mod1_sim = coda.samples(mode=mod1, variable.names = params1, n.iter=5e3)
+mod1_csim = do.call(rbind, mod1_sim)
+```
+
+## Convergence
+```{r conv}
+plot(mod1_sim)
+gelman.diag(mod1_sim)
+autocorr.diag(mod1_sim)
+```
+Different colors indicate different chains. No trend line seems exist, which is good.
+
+
+## summary
+```{r}
+summary(mod1_sim)
+summary(lmod)
 ```
