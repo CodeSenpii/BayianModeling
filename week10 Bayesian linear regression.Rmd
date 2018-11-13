@@ -1,0 +1,16 @@
+---
+title: "week10 Bayesian linear regression"
+author: "kwon"
+date: "2018년 11월 13일"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+require("cars")
+data("Leinhardt")
+```
+
+## investigate marginal relationship
+```{r}
+pairs(Leinhardt)
+```
