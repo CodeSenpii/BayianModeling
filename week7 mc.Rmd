@@ -1,0 +1,85 @@
+---
+title: "week7 MC"
+author: "kwon"
+date: "2018년 11월 13일"
+output: pdf_document
+---
+
+# Monte Carlo Estimation
+```{r setup, include=FALSE}
+```
+
+## Monte Carlo estimation
+```{r}
+m = 10000
+a = 2
+b = 1/3
+theta = rgamma(n=m, shape= a, rate = b)
+# simulated hist
+hist(theta, freq=FALSE)
+# true curve
+curve(dgamma(x, a, b), col="blue", add=TRUE)
+
+# simulated value
+mean(theta)
+# true value
+a/b
+
+var(theta)
+a/b^2
+```
+```{r}
+# simulated
+ind = theta<5.0
+mean(ind)
+
+# true
+pgamma(q=5.0, a, b)
+```
+
+## Monte Calro error
+```{r error}
+se = sd(theta)/ sqrt(m)
+
+# this amount falls out of true values
+2*se
+mean(theta)+c(-1,1)*2*se
+
+# standard error for indicator variable
+se = sd(ind) / sqrt(m)
+2*se
+```
+
+## Hierarchical model
+$$ \phi_i \sim Beta(2,2) $$
+$$ y_i \sim Binom(10,\phi_i) $$
+```{r hm}
+m = 10000
+start_time <- Sys.time()
+y = numeric(m)
+phi = numeric(m)
+for(i in length(y)){
+  phi[i] = rbeta(1, 2,2)
+  y[i] = rbinom(1, 10, phi[i])
+}
+end_time <- Sys.time()
+print(end_time - start_time)
+
+
+start_time <- Sys.time()
+phi = rbeta(m, 2, 2)
+y = rbinom(m, size = 10, prob = phi)
+end_time <- Sys.time()
+print(end_time - start_time)
+
+# probability of each successes
+table(y)/m
+plot(table(y)/m)
+```
+
+
+
+
+
+
+
