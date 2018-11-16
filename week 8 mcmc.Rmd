@@ -10,6 +10,13 @@ require(rjags)
 ```
 
 # MCMC Rat tumor example
+## Model
+$$ y_j \sim Bin(\theta_j, n_j)$$
+$$ \theta_j \sim Beta(\alpha, \beta)$$
+$$ \alpha \sim Exp(\lambda=0.01) $$
+$$ \beta \sim Exp(\lambda=0.01) $$
+
+
 ## Setting
 $n_j = $ total numer of rats in contrl group of experiment j \
 $y_j = $ number of control group of experiment j that develop a tumor \
@@ -25,6 +32,42 @@ $$ \hat \theta_j = \frac {y_j}{n_j} $$
 
 ## JAGS
 ```{r}
+d = read.table("rattumor.txt", header=T)
+thetahat = d$y/d$N
+Etheta = mean(thetahat)
+Vtheta = var(thetahat)
+(alphahat = Etheta*(Etheta*(1-Etheta)/Vtheta-1))
+(betahat = alphahat*(1/Etheta-1))
+```
+To choose overdisperesed hyperparameters, it needs to 100 times larger and smaller than we expect. \
+Thus, alpha ~ (0.01, 100), beta ~ (0.1, 1000)
+
+## Initialization and adaptation
+```{r}
+initial.vals = list(list(alpha=0.01, beta=0.1),
+                    list(alpha=100, beta=0.1),
+                    list(alpha=0.01, beta=1000),
+                    list(alpha=100, beta=1000))
+
+# jags automatically conducts adaptation for default
+m1 = jags.model("rattumor1.bug", d, inits = initial.vals, n.chains= 4, n.adapt = 1000)
 
 ```
+
+```{r}
+# burn-in
+update(m1, 1000)
+x1 = coda.samples(m1, c("alpha", "beta"), n.iter=2000)
+plot(x1, smooth=FALSE)
+```
+4 different chains(colors) do not become converged. iterations start from 2000, because there was 1000 adaptation, and 1000 burn in.
+
+```{r}
+plot(as.matrix(x1)[,c('alpha', 'beta')], pch=".", cex=2)
+```
+Samples seem to have very high correlations between alpha and beta.
+
+
+
+
 
