@@ -6,6 +6,12 @@ output: html_document
 ---
 
 # Metropolis
+## Simple Bayesian model for a normal sample
+$$ y_1,...,y_n | \mu, \sigma^2 \sim iid N(\mu, \sigma^2) $$
+$$ \mu \sim N(\mu_0, \tau_0^2) $$
+$$ \sigma^2 \sim Inv-\chi^2(\nu_0, \sigma_0^2)$$
+
+
 ## setting
 ```{r}
 # setting
@@ -15,13 +21,13 @@ s.2 = 1.684
 
 mu0 = 1.10
 tau.2.0 = sigma.2.0 = 1.17
-nu0 = 0
+nu0 = 1
 
 # convenience functions
 # inverse chi-square density
 dinvchisq = function(x, df, scale){
   if(x>0)
-    ((df/2)^(df/2) / gamma(df/2)) * scale^df *x(-(df/2+1))*exp(-df*scale/(2*x))
+    ((df/2)^(df/2) / gamma(df/2)) * scale^df *x^(-(df/2+1))*exp(-df*scale/(2*x))
   else 0
 }
 
@@ -30,8 +36,9 @@ likelihood = function(mu, sigma.2){
 }
 
 # evaluating ratio funciton
-ratio = function(mu.prop, sigma.2.prop, mu.old, siga.2.old){
-  
+ratio = function(mu.prop, sigma.2.prop, mu.old, sigma.2.old){
+  dnorm(mu.prop, mu0, sqrt(tau.2.0)) *dinvchisq(sigma.2.prop, nu0, sigma.2.0) * likelihood(mu.prop, sigma.2.prop) /
+    (dnorm(mu.old, mu0, sqrt(tau.2.0)) * dinvchisq(sigma.2.old, nu0, sigma.2.0) * likelihood(mu.old, sigma.2.old))
 }
 ```
 In practice, it is better avoid this numerical problems by using log or else.
@@ -52,16 +59,27 @@ mu.sim[1]=2
 sigma.2.sim[1] = 2.5
 
 for(t in 2:n.sim){
-  mu.sim[t] = rnorm(1, mun(sigma.2.sim[t-1]),
-                    sqrt(tau.2.n(sigma.2.sim[t-1])))
+  mu.prop = rnorm(1, mu.sim[t-1], sqrt(rho))
+  sigma.2.prop = rnorm(1, sigma.2.sim[t-1], sqrt(rho))
   
-  sigma.2.sim[t] = 1/rgamma(1, (nu0+n)/2,
-                            (nu0+n)*sigma.2.n(mu.sim[t])/2)
+  accept.prob[t-1] = min(ratio(mu.prop, sigma.2.prop, mu.sim[t-1], sigma.2.sim[t-1]), 1)
+  if(runif(1) < accept.prob[t-1])
+  {
+    mu.sim[t] = mu.prop
+    sigma.2.sim[t] = sigma.2.prop
+  } else 
+  {
+    mu.sim[t] = mu.sim[t-1]
+    sigma.2.sim[t] =sigma.2.sim[t-1]
+  }
 }
 ```
 
-
-
+```{r}
+mean(accept.prob)
+plot(mu.sim, sigma.2.sim, type="l" , main="Metropolis")
+```
+Acceptance rate is higher than optimal. could improve by increasing p.
 
 
 

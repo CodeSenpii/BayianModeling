@@ -1,0 +1,30 @@
+---
+title: "week 8 mcmc"
+author: "kwon"
+date: "2018년 11월 16일"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(rjags)
+```
+
+# MCMC Rat tumor example
+## Setting
+$n_j = $ total numer of rats in contrl group of experiment j \
+$y_j = $ number of control group of experiment j that develop a tumor \
+$\theta_j = $ control group tumor probability in experiment j \
+$$ j = 1, ..., 71 $$
+- 4 chains \
+- Hpyerparmeters to overdispersed \
+- 1000 iterations for adaption \
+
+- Determine crude preliminary values for parameters for "overdispersed". \
+$$ \hat \theta_j = \frac {y_j}{n_j} $$ 
+
+
+## JAGS
+```{r}
+
+```
+
