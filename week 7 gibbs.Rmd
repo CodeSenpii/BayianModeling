@@ -93,3 +93,22 @@ plot(as.mcmc(post))
 summary(as.mcmc(post))
 ```
 
+## Assessing Convergence
+```{r}
+plot(as.mcmc(post)[,1])
+```
+For trace, there should not be a trend. It should be staionary across iterations.
+
+```{r}
+# auto correlation
+autocorr.plot(as.mcmc(post))
+autocorr.diag(as.mcmc(post))
+
+# effective sample size
+effectiveSize(as.mcmc(post))
+```
+
+Auto correlated samples are less informative than independent samples. Lets suppose you are to find the best movie by asking to people. Randomly sampled 20 people would give more information than your 20 friends' movie preferences, because they are more likely to have similar interests.
+
+
+

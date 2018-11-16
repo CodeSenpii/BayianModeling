@@ -1,0 +1,67 @@
+---
+title: "week 7"
+author: "kwon"
+date: "2018년 11월 15일"
+output: html_document
+---
+
+# Metropolis
+## setting
+```{r}
+# setting
+n = 271
+ybar = 1.4
+s.2 = 1.684
+
+mu0 = 1.10
+tau.2.0 = sigma.2.0 = 1.17
+nu0 = 0
+
+# convenience functions
+# inverse chi-square density
+dinvchisq = function(x, df, scale){
+  if(x>0)
+    ((df/2)^(df/2) / gamma(df/2)) * scale^df *x(-(df/2+1))*exp(-df*scale/(2*x))
+  else 0
+}
+
+likelihood = function(mu, sigma.2){
+  sigma.2^(-n/2)*exp(-(n-1)*s.2/(2*sigma.2))*exp(-n*(mu-ybar)^2/(2*sigma.2))
+}
+
+# evaluating ratio funciton
+ratio = function(mu.prop, sigma.2.prop, mu.old, siga.2.old){
+  
+}
+```
+In practice, it is better avoid this numerical problems by using log or else.
+
+## simulating
+```{r}
+# run gibbs sampler:
+n.sim = 1000
+mu.sim = numeric(n.sim)
+sigma.2.sim = numeric(n.sim)
+accept.prob = numeric(n.sim-1) # no need for final draw
+
+# arbitrary chosen proposal
+rho = 0.01
+
+# starting values
+mu.sim[1]=2
+sigma.2.sim[1] = 2.5
+
+for(t in 2:n.sim){
+  mu.sim[t] = rnorm(1, mun(sigma.2.sim[t-1]),
+                    sqrt(tau.2.n(sigma.2.sim[t-1])))
+  
+  sigma.2.sim[t] = 1/rgamma(1, (nu0+n)/2,
+                            (nu0+n)*sigma.2.n(mu.sim[t])/2)
+}
+```
+
+
+
+
+
+
