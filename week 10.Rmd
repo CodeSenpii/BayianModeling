@@ -5,13 +5,39 @@ date: "2018년 11월 1일"
 output: pdf_document
 ---
 
+# Bayesian Linear Regression
 ```{r setup}
 Election = seq(1952, 2004, 4)
 IncumbentPct = c(44.6, 57.8, 49.9, 61.3, 49.6, 61.8, 49.0, 44.7, 59.2, 53.9, 46.5, 54.7, 50.3, 51.2)
 IncomeGrowth = c(2.4, 2.9, 0.8, 4.2, 3.0, 3.6, 1.1, -0.4, 3.9, 2.3, 0.4, 1.0, 2.4, 1.9)
 
-bp =data.frame(Election, IncumbentPct, IncomeGrowth)
+bp = data.frame(Election, IncumbentPct, IncomeGrowth)
 ```
+Relationship is roguly a straight line:
+$$ y \approx \beta_1 + \beta_2x $$
+$$ \epsilon_i = y_i - (\beta_1 + \beta_2x)$$
+Epsilon considered as random, and thus, y is considered to be random.
+
+## Conditional Modeling
+y depends on X. That is, use only the conditional distribution of y given X to make inference about parameter $\theta$, ignoring masrginal distribution of X, treated as constant.
+
+$$ \prod_{i=1}^n p(y_i|\theta, X_i) $$
+
+$$ E(y_i | \theta, X_i) = \beta_1 x_{i1} + ... + \beta_k x_{ik} $$
+
+Norninformative Prior
+$$ p(\beta, \sigma^2 | X) \propto (\sigma^2)^{-1} $$
+Still leads to proper posterior: \
+- X are linearly independent \
+- n > k \
+
+Full Posterior
+$$ \beta | \sigma^2, y, X \sim N(\hat \beta, \sigma^2 V_\beta$$
+$$ \sigma^2 | y, X \sim Inv-\chi^2(n-k, s^2) $$
+
+Prediction \
+1. simulate $\theta = (\beta, \sigma^2)$ from poserior as before. \
+2. Simulate $\hat y $ given the simulated $\theta$.
 
 ## Classical lm
 ```{r}
@@ -27,45 +53,56 @@ n.minus.k = df.residual(mod)
 
 ## Posterior Simulation
 ```{r posterior simulation}
-library(MASS)
+library(MASS) # provides mvrnorm, multivariate normal
 Nsim = 1000
+# inverse cai square(n-k degree of freedom)
 post.sigma.2.sim = n.minus.k*s.2/rchisq(Nsim, n.minus.k)
 
 post.beta.sim = matrix(NA, Nsim, length(betahat))
+# simulate beta
 for(s in 1:Nsim)
   post.beta.sim[s,] = mvrnorm(1, betahat, post.sigma.2.sim[s]*Vbeta)
 ```
 
 ```{r}
-# posterior interval
+# sigma posterior interval
 quantile(post.sigma.2.sim, c(0.025, 0.975))
-
+# beta posterior interval
 apply(post.beta.sim, 2, quantile, c(0.025, 0.975))
-
+# classical intervals, for comparison
 confint(mod)
-
+# posterior probability of the growth is positive
 mean(post.beta.sim[,2] > 0)
 ```
 
 ## Prediction
 ```{r prediction}
 # incomeGrowth on 2008 was 0.75
+# simulate from posterior predictive distribution
 post.pred.y.sim = rnorm(Nsim, post.beta.sim[,1]+post.beta.sim[,2]*0.75,sqrt(post.sigma.2.sim))
 
 quantile(post.pred.y.sim, c(0.025, 0.975))
 
+# classical prediction
 predict(mod, data.frame(IncomeGrowth=0.75), interval="prediction")
 
 # posterior predictive probability of 2008 incumbent victory
 mean(post.pred.y.sim > 50)
 ```
 
+## Diagnostics
+Classical regression diagnostics are based on residuals.
+
 ## Model Checking
 ```{r diagnostic}
 par(mfrow=c(2,2))
 plot(mod)
 ```
+
+
 ## posterior-simulated standardized errors
+Residuals are proxies for the errors. In bayesians, we can simulate errors from their posterior distributions.
+Standardized replicated error have independent standard noraml distribution, conditional on any beta and sigma^2.
 ```{r}
 error.std.sim = matrix(NA, Nsim, nrow(bp))
 for(s in 1:Nsim)
@@ -77,10 +114,23 @@ ref.std.normal = matrix(rnorm(Nsim*nrow(bp)), Nsim, nrow(bp))
 
 ## Test quantitiy
 Checking for outliers
+$$ T(y, X, \theta) = \frac{max_i |\epsilon_i/\sigma|}{median_i |\epsilon_i/\sigma|} $$
 ```{r}
 max.t.rep = apply(abs(ref.std.normal),1, max)
 max.t.sim = apply(abs(error.std.sim), 1, max)
 mean(max.t.rep >= max.t.sim)
+
+median.t.rep = apply(abs(ref.std.normal), 1, max)/ apply(abs(ref.std.normal), 1, median)
+median.t.sim = apply(abs(error.std.sim), 1, max)/ apply(abs(error.std.sim), 1, median)
+mean(median.t.rep >= median.t.sim)
+```
+Stil no evidence of outliers. \
+
+Is there any systematic relationship between errors and time t(election year)? \
+consider test quantity
+$$ T(y, X, \theta) = |\hat{cor}(\epsilon, t)| $$
+```{r}
+mean(abs(cor(t(ref.std.normal), bp$Election)) >= abs(cor(t(error.std.sim), bp$Election)))
 ```
 
 

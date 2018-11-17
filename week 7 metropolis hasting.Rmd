@@ -93,6 +93,7 @@ traceplot(as.mcmc(post$mu))
 post$accpt
 ```
 It looks reached to stationary distribution. However, it appears our proposal step size is little too large`r post$accpt`
+
 ```{r}
 post = mh(n=n, ybar=ybar, n_iter=1e3, mu_init=0.0, cand_sd=0.05)
 post$accpt
