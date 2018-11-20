@@ -1,0 +1,176 @@
+---
+title: "ABM4_Kwon_YoungJu"
+author: "kwon"
+date: "2018년 11월 1일"
+output: 
+  pdf_document: 
+    keep_tex: no
+    latex_engine: xelatex
+---
+
+# Assignment 4
+
+##*(a)*
+```{r a}
+data = read.table("hubbledata.txt", header=T)
+plot(data$distance, data$radialvelocity, xlab= "distance", ylab= "radial velocity", main="Hubble")
+```
+
+##*(b)*
+###*(i)*
+```{r bi}
+# jags model
+# model {
+# 
+#   for (j in 1:length(radialvelocity)) {
+#     radialvelocity[j] ~ dnorm(beta1+beta2*distance[j], sigmasqinv)
+#   }
+#   
+#   beta1 ~ dnorm(0, 0.00000001)
+#   beta2 ~ dnorm(0, 0.00000001)
+#   sigmasqinv ~ dgamma(0.0001, 0.0001)
+#   
+#   sigmasq = 1/sigmasqinv
+# }
+
+
+require(rjags)
+initial.vals = list(list(beta1 = 10000, beta2=10000, sigmasqinv=0.01),
+                    list(beta1 = 10000, beta2=-10000, sigmasqinv=0.01),
+                    list(beta1 = 10000, beta2=10000, sigmasqinv=0.000001),
+                    list(beta1 = 10000, beta2=-10000, sigmasqinv=0.000001),
+                    list(beta1 = -10000, beta2=10000, sigmasqinv=0.01),
+                    list(beta1 = -10000, beta2=-10000, sigmasqinv=0.01),
+                    list(beta1 = -10000, beta2=10000, sigmasqinv=0.000001),
+                    list(beta1 = -10000, beta2=-10000, sigmasqinv=0.000001))
+m1 = jags.model("hubble.bug", data, initial.vals, n.chains = 8)
+
+update(m1, 2000)
+x1 = coda.samples(m1, c("beta1", "beta2", "sigmasq"), n.iter=2000)
+plot(x1, smooth = FALSE)
+```
+The classical linear regression gives 400 as slope, thus initial values of beta2 is set from -10000 to +10000.
+For residual standard error, it gives 230. In similar context, the initial values for sigmasq is set from 100 to 1000000. \
+As seen in the graph, trace of sigmasq, beta1, and beta2 overlap over all iterations. Moreover, density plot of three variables also look proper. \
+
+###*(ii)*
+```{r bii}
+summary(x1)
+```
+
+###*(iii)*
+```{r biii}
+post.samp = as.matrix(x1)
+mean(post.samp[, "beta2"])
+quantile(post.samp[,"beta2"], c(0.025, 0.975))
+```
+Mean and 95% posterior credible interval of slope appear to be positive.
+
+###*(iv)*
+```{r biv}
+mean(post.samp[, "beta1"])
+quantile(post.samp[,"beta1"], c(0.025, 0.975))
+```
+Posterior credible interval of intercept contains zero.
+
+##*(c)*
+###*(i)*
+```{r ci}
+# jags model2
+# model {
+# 
+#   for (j in 1:length(radialvelocity)) {
+#     radialvelocity[j] ~ dnorm(beta2*distance[j], sigmasqinv)
+#   }
+#   
+#   beta2 ~ dnorm(0, 0.00000001)
+#   sigmasqinv ~ dgamma(0.0001, 0.0001)
+#   
+#   sigmasq = 1/sigmasqinv
+# }
+
+initial.vals = list(list(beta2=10000, sigmasqinv=0.01),
+                    list(beta2=-10000, sigmasqinv=0.01),
+                    list(beta2=10000,sigmasqinv=0.000001),
+                   list(beta2=-10000,sigmasqinv=0.000001))
+m2 = jags.model("hubble2.bug", data= data, inits = initial.vals, n.chains=4)
+
+update(m2, 2000)
+x2 = coda.samples(m2, c("beta2", "sigmasq"), n.iter=2000)
+plot(x2, smooth = FALSE)
+```
+
+Both beta2 and sigmasq appear to be stationary. \
+
+###*(ii)*
+```{r cii}
+summary(x2)
+```
+
+### *(iii)*
+```{r ciii}
+post.samp2 = as.matrix(x2)
+mean(post.samp2[, "beta2"])
+quantile(post.samp2[,"beta2"], c(0.025, 0.975))
+```
+
+### *(iv)*
+```{r civ}
+paste("Mean1:", mean(post.samp[,"beta2"]))
+paste("Mean2:", mean(post.samp2[,"beta2"]))
+
+paste("SD1:", sd(post.samp[,"beta2"]))
+paste("SD2:", sd(post.samp2[,"beta2"]))
+
+print("Quantile1:")
+quantile(post.samp[,"beta2"])
+range1= quantile(post.samp[,"beta2"])[5]-quantile(post.samp[,"beta2"])[1]
+print("Quantile2:")
+quantile(post.samp2[,"beta2"])
+range2= quantile(post.samp2[,"beta2"])[5]-quantile(post.samp2[,"beta2"])[1]
+```
+Both mean slope of the no-intercept model (c) and standard deviation of slope dropped by 30 compared to those of model (b). As a result, the credible interval of model (c) also becomes narrower which is  `r range2` wide, while the credible interval fo model (b) covers `r range1`.
+
+## *(d)*
+### *(i)*
+```{r di}
+Nsim = dim(post.samp2)[1]
+error.sim = matrix(NA, Nsim, nrow(data))
+for(s in 1:Nsim){
+  error.sim[s,] = (data$radialvelocity- data$distance *post.samp2[s, "beta2"])
+}
+```
+
+### *(ii)*
+```{r dii}
+require("invgamma")
+rep.y = matrix(NA, Nsim, nrow(data))
+rep.normal = matrix(NA, Nsim, nrow(data))
+for(i in 1:Nsim){
+  rep.y[i,] = rnorm(nrow(data), data$distance*post.samp2[i, "beta2"], sqrt(post.samp2[i,"sigmasq"]))
+  rep.normal[i,] = rep.y[i,]- data$distance *post.samp2[i, "beta2"]
+}
+
+```
+
+### *(iii)*
+```{r diii}
+rep.test.q = abs(cor(t(rep.normal), data$distance))
+test.q = abs(cor(t(error.sim), data$distance))
+```
+
+### *(iv)*
+```{r div}
+plot(test.q, rep.test.q, pch=".", cex=2, 
+     xlim= c(min(test.q, rep.test.q), max(test.q, rep.test.q)),
+     ylim = c(min(test.q, rep.test.q), max(test.q, rep.test.q)),
+     xlab="cor(e,x)", ylab = "cor(rep-e, x)")
+abline(a=0, b=1)
+```
+
+### *(v)*
+```{r dv}
+mean(rep.test.q >= test.q)
+```
+It seems there is no evidence of a relationship between error and distance. It suggests the no-intercept model fits.
+
