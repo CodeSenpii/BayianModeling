@@ -5,6 +5,36 @@ date: "2018년 11월 24일"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+# Hierarchical Normal Regression
+## Model
+Using flint data, build
+$$ y_{ij} | \beta^d, \beta^h, \sigma_y^2 \sim indep. N(\beta_j^d + \beta_i^h, \sigma_y^2) $$
+$$ \beta_i^h | \sigma_h^2 \sim iid N (0, \sigma_h^2) $$
+where, $\beta_i^h = $ household i effect(random), $\beta_j^d = $ draw j effect(fixed), \n
+$\sigma_h^2 = $ variance between households, $\sigma_y^2 = $ measurement variance(within households) \n
 
+Expect mean lead levels to fall as flushing time increases. \n
+
+### priors
+Noninformative
+$$ p(\sigma_y^2) \propto (\sigma_y^2)^{-1}$$
+$$ p(\sigma_h^2) \propto (\sigma_h^2)^{-1/2}$$
+
+$$ p(\beta_1^d, \beta_2^d, \beta_3^d) \propto 1$$
+
+```{r setup}
+data= read.table("flint-data-simple.txt", header=T, sep="\t")
 ```
+
+```{r}
+idx = nrow(data)
+plot(1:idx, cbind(data$Pb.Bottle.1..ppb....First.Draw, data$Pb.Bottle.2..ppb....45.secs.flushing), type="l")
+```
+
+
+
+
+
+
+
+
