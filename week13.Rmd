@@ -45,13 +45,61 @@ inits1 = list(list(betadraw=c(100, 100, 100),
               list(betadraw= c(-100, -100, 100),
                    sigmasqyinv=1000, sigmahouse=0.01),
               list(betadraw=c(-100, 100, -100),
-                   sigmaqyinv =0.0001, sigmahouse=0.01),
+                   sigmasqyinv =0.0001, sigmahouse=0.01),
               list(betadraw=c(100, -100, -100),
                    sigmasqyinv = 1000, sigmahouse=100))
 ```
 
+## Modeling
+```{r modeling}
+library(rjags)
+m1= jags.model("flint1.bug", d1, inits1, n.chains=4, n.adapt=1000)
+update(m1,1000)
+
+x1 = coda.samples(m1, c("betadraw", "sigmasqy", "sigmasqhouse"), n.iter=2000)
+```
+
+## Convergence check
+```{r convergence}
+gelman.diag(x1, autoburnin = F)
+gelman.plot(x1, autoburnin = F)
+plot(x1, smooth = F)
+```
+Convergence may envetually occur, but much burn-in needed. Doubling the number of iterations.
+### More iterations
+```{r}
+x1 = coda.samples(m1, c("betadraw", "betahouse", "sigmasqy", "sigmasqhouse"), n.iter=2000)
+effectiveSize(x1[,c("betadraw[1]", "betadraw[2]", "betadraw[3]", "sigmasqy", "sigmasqhouse")])
+
+summary(x1[,c("betadraw[1]", "betadraw[2]", "betadraw[3]", "sigmasqy", "sigmasqhouse")])
+```
+
+```{r}
+post.samp = as.matrix(x1)
+draw1.90pct.house = exp(qnorm(0.9, post.samp[,"betadraw[1]"], sqrt(post.samp[,"sigmasqhouse"])))
+hist(draw1.90pct.house, freq=F)
+```
+
+Include error in measurement
+```{r}
+post.samp = as.matrix(x1)
+draw1.90pct.meas = exp(qnorm(0.9, post.samp[,"betadraw[1]"], sqrt(post.samp[,"sigmasqhouse"]+post.samp[,"sigmasqy"])))
+hist(draw1.90pct.meas, freq=F)
+```
+
+90th percentile of measrue first-draw lead levels not exceed 15 ppb.
+
+```{r}
+mean(post.samp[,"betadraw[1]"]> post.samp[,"betadraw[2]"])
+mean(post.samp[,"betadraw[2]"]> post.samp[,"betadraw[3]"])
+```
+Draw level decreases as flush time. \n
 
 
+Correlation
+```{r}
+house.corr = post.samp[]
+```
 
 
 

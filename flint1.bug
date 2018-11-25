@@ -2,10 +2,10 @@ data {
 	dimY <- dim(loglead)
 }
 
-modle {
+model {
 	for(i in 1:dimY[1]){
-		for(j in 1:dimY[2]{
-			loglead[i,j] ~ dnorm(betadraw[j] + betahouse[i], sigmasqyingv)
+		for(j in 1:dimY[2]){
+			loglead[i,j] ~ dnorm(betadraw[j] + betahouse[i], sigmasqyinv)
 		}
 		betahouse[i]~ dnorm(0, 1/sigmahouse^2)
 	}
