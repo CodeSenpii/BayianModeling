@@ -23,15 +23,32 @@ $$ p(\sigma_h^2) \propto (\sigma_h^2)^{-1/2}$$
 $$ p(\beta_1^d, \beta_2^d, \beta_3^d) \propto 1$$
 
 ```{r setup}
-data= read.table("flint-data-simple.txt", header=T, sep="\t")
 ```
 
-```{r}
-idx = nrow(data)
-plot(1:idx, cbind(data$Pb.Bottle.1..ppb....First.Draw, data$Pb.Bottle.2..ppb....45.secs.flushing), type="l")
+```{r read}
+flint= read.table("flint-data-simple.txt", header=T, sep="\t")
+head(flint)
 ```
 
+## Modeling
+```{r init}
+# data prep for JAGS
+d1 = list(loglead = log(flint[,c("FirstDraw", "After45Sec", "After2Min")]),
+          betadraw0 = c(0,0,0),
+          Sigmabetadrawinv = rbind(c(0.0001, 0, 0),
+                                   c(0, 0.0001, 0),
+                                   c(0, 0, 0.0001)))
 
+# init 4 chains
+inits1 = list(list(betadraw=c(100, 100, 100),
+                   sigmasqyinv=0.0001, sigmahouse=100),
+              list(betadraw= c(-100, -100, 100),
+                   sigmasqyinv=1000, sigmahouse=0.01),
+              list(betadraw=c(-100, 100, -100),
+                   sigmaqyinv =0.0001, sigmahouse=0.01),
+              list(betadraw=c(100, -100, -100),
+                   sigmasqyinv = 1000, sigmahouse=100))
+```
 
 
 

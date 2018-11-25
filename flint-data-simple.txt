@@ -1,4 +1,4 @@
-SampleID	Zip Code	Ward	Pb Bottle 1 (ppb) - First Draw	Pb Bottle 2 (ppb) - 45 secs flushing	Pb Bottle 3 (ppb) - 2 mins flushing
+SampleID	Zip Code	Ward	FirstDraw	After45Sec	After2Min
 1	48504	6	0.344	0.226	0.145
 2	48507	9	8.133	10.77	2.761
 4	48504	1	1.111	0.11	0.123

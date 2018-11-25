@@ -1,0 +1,19 @@
+data {
+	dimY <- dim(loglead)
+}
+
+modle {
+	for(i in 1:dimY[1]){
+		for(j in 1:dimY[2]{
+			loglead[i,j] ~ dnorm(betadraw[j] + betahouse[i], sigmasqyingv)
+		}
+		betahouse[i]~ dnorm(0, 1/sigmahouse^2)
+	}
+	
+	betadraw ~ dmnorm(betadraw0, Sigmabetadrawinv)
+	sigmahouse ~ dunif(0, 1000)
+	sigmasqyinv ~ dgamma(0.0001, 0.0001)
+	
+	sigmasqhouse <- sigmahouse^2
+	sigmasqy <- 1/sigmasqyinv
+}
