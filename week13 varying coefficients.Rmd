@@ -1,0 +1,10 @@
+---
+title: "week13 varying coefficient"
+author: "kwon"
+date: "2018년 11월 25일"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+ratgrowth = read.table("rattumor.txt", header=T)
+```
