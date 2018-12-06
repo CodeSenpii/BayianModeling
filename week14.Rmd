@@ -1,0 +1,11 @@
+---
+title: "week14"
+author: "kwon"
+date: "2018년 12월 6일"
+output: html_document
+---
+
+### Logistic Regression
+```{r}
+ebola = read.table("ebola.txt", header=T, sep="\t")
+```
