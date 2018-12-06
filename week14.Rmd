@@ -7,5 +7,34 @@ output: html_document
 
 ### Logistic Regression
 ```{r}
+# Bundibugyo: BDBV, Sudan:SUDV, Zaire: EBOV
 ebola = read.table("ebola.txt", header=T, sep="\t")
+ebola = ebola[-19,]
+colnames(ebola[3]) = "species"
+ebola$Ebolavirus.species= ifelse(ebola$Ebolavirus.species=="Bundibugyo", "BDBV", ifelse(ebola$Ebolavirus.species=="Sudan", "SUDV", "EBOV"))
+with(ebola, plot(Year, Case.fatality, col = unclass(factor(ebola$Ebolavirus.species))))
 ```
+
+
+## Initial Model
+$$ y_i | \beta, X_i \sim indep. Bin(n_i, p_i) $$
+$$ logit(p_i) = X_i\beta = \beta_1x_{i1} + \beta_2x_{i2} + \beta_3 x_{i3}+\beta_4 x_{i4} $$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

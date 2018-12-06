@@ -1,0 +1,7 @@
+model {
+	
+	for(i in 1:length(deaths)){
+		death[i] ~ dbin(prob[i], cases[i])
+		logit(prob[i]) <-
+	}
+}
