@@ -1,0 +1,17 @@
+---
+title: "week15"
+author: "kwon"
+date: "2018년 12월 6일"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(MASS)
+```
+
+
+```{r}
+head(ships)
+shipssub = subset(ships, service>0)
+
+```

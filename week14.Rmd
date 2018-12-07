@@ -6,11 +6,12 @@ output: html_document
 ---
 
 ### Logistic Regression
-```{r}
+## read data
+```{r read}
 # Bundibugyo: BDBV, Sudan:SUDV, Zaire: EBOV
 ebola = read.table("ebola.txt", header=T, sep="\t")
 ebola = ebola[-19,]
-colnames(ebola[3]) = "species"
+
 ebola$Ebolavirus.species= ifelse(ebola$Ebolavirus.species=="Bundibugyo", "BDBV", ifelse(ebola$Ebolavirus.species=="Sudan", "SUDV", "EBOV"))
 with(ebola, plot(Year, Case.fatality, col = unclass(factor(ebola$Ebolavirus.species))))
 ```
@@ -20,15 +21,44 @@ with(ebola, plot(Year, Case.fatality, col = unclass(factor(ebola$Ebolavirus.spec
 $$ y_i | \beta, X_i \sim indep. Bin(n_i, p_i) $$
 $$ logit(p_i) = X_i\beta = \beta_1x_{i1} + \beta_2x_{i2} + \beta_3 x_{i3}+\beta_4 x_{i4} $$
 
+## Initialization
+```{r init}
+d1 = list(deaths = ebola$Deaths,
+          cases = ebola$Cases,
+          virus = unclass(ebola$Virus),
+          yearscaled = as.vector(scale(ebola$Year, scale=2*sd(ebola$Year))))
 
+inits1 = list(list(betavirus=c(10,10,10), betayear=10),
+              list(betavirus=c(10,10,-10), betayear=-10),
+              list(betavirus=c(10,-10,10), betayear=-10),
+              list(betavirus=c(10,-10,-10), betayear=10))
+```
 
+### Modeling
+```{r modeling}
+library(rjags)
+m1 = jags.model("ebola1.bug", d1, inits1, n.chains = 4, n.adapt = 1000)
+update(m1, 1000)
+x1 = coda.samples(m1, c("betavirus", "betayear"), n.iter=2000)
+```
 
+### Convergence Check
+```{r converge}
+gelman.diag(x1, autoburnin=F)
+```
 
+### Further Sample
+```{r sample}
+x1 = coda.samples(m1, c("betavirus", "betayear", "prob","deathsrep"), n.iter=2000)
 
+effectiveSiz(x1[,1:4])
+summary(x1[,1:4])
+```
 
+### Posterior Predictive Checking
+```{r post check}
 
-
-
+```
 
 
 

@@ -1,4 +1,4 @@
-Year	Country	Ebolavirus species	Cases	Deaths	Case fatality
+Year	Country	Virus	Cases	Deaths	Case fatality
 2012	Democratic Republic of Congo	Bundibugyo	57	29	51%
 2012	Uganda	Sudan	7	4	57%
 2012	Uganda	Sudan	24	17	71%

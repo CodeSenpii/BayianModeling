@@ -1,0 +1,8 @@
+---
+title: "week 14 overdispersion"
+author: "kwon"
+date: "2018년 12월 6일"
+output: html_document
+---
+
+## Logit Regression

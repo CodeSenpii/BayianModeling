@@ -2,6 +2,12 @@ model {
 	
 	for(i in 1:length(deaths)){
 		death[i] ~ dbin(prob[i], cases[i])
-		logit(prob[i]) <-
+		logit(prob[i]) <-betavirus[virus[i]] + betayear*yearscaled[i]
+		deathsrep[i] ~ dbin(prob[i], cases[i])
 	}
+	
+	for(j in 1:max(virus)){
+		betavirus[j] ~ dt(0, 0.01, 1)
+	}
+	betayear ~ dt(0, 0.16, 1)
 }
