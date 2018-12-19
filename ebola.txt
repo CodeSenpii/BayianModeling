@@ -1,25 +1,25 @@
-Year	Country	Virus	Cases	Deaths	Case fatality
-2012	Democratic Republic of Congo	Bundibugyo	57	29	51%
-2012	Uganda	Sudan	7	4	57%
-2012	Uganda	Sudan	24	17	71%
-2011	Uganda	Sudan	1	1	100%
-2008	Democratic Republic of Congo	Zaire	32	14	44%
-2007	Uganda	Bundibugyo	149	37	25%
-2007	Democratic Republic of Congo	Zaire	264	187	71%
-2005	Congo	Zaire	12	10	83%
-2004	Sudan	Sudan	17	7	41%
-2003	Congo	Zaire	35	29	83%
-2003	Congo	Zaire	143	128	90%
-2001	Congo	Zaire	59	44	75%
-2001	Gabon	Zaire	65	53	82%
-2000	Uganda	Sudan	425	224	53%
-1996	South Africa (ex-Gabon)	Zaire	1	1	100%
-1996	Gabon	Zaire	60	45	75%
-1996	Gabon	Zaire	31	21	68%
-1995	Democratic Republic of Congo	Zaire	315	254	81%
-1994	Cote dIvoire	Tai Forest	1	0	0%
-1994	Gabon	Zaire	52	31	60%
-1979	Sudan	Sudan	34	22	65%
-1977	Democratic Republic of Congo	Zaire	1	1	100%
-1976	Sudan	Sudan	284	151	53%
-1976	Democratic Republic of Congo	Zaire	318	280	88%
+Year  Country    Virus  Cases  Deaths
+1976  Sudan      SUDV   284    151
+1976  Zaire/DRC  EBOV   318    280
+1979  Sudan      SUDV    34     22
+1994  Gabon      EBOV    52     31
+1995  Zaire/DRC  EBOV   315    254
+1996  Gabon      EBOV    37     21
+1996  Gabon      EBOV    60     45
+2000  Uganda     SUDV   425    224
+2001  Gabon      EBOV   135    107
+2002  Congo      EBOV   143    128
+2003  Congo      EBOV    35     29
+2004  Sudan      SUDV    17      7
+2007  Zaire/DRC  EBOV   264    187
+2007  Uganda     BDBV   149     37
+2008  Zaire/DRC  EBOV    32     14
+2012  Uganda     SUDV    24     17
+2012  Zaire/DRC  BDBV    77     36
+
+# From: https://en.wikipedia.org/wiki/List_of_Ebola_outbreaks
+# Note: Only major outbreaks are included (>10 cases)
+# Note: Sudan has since been divided
+# Note: Zaire became Democratic Republic of the Congo (DRC)
+# Note: Congo is the Republic of the Congo
+# Note: The 2001 Gabon outbreak also involved DRC

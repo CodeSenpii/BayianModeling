@@ -1,0 +1,22 @@
+---
+title: "week16"
+author: "kwon"
+date: "2018년 12월 19일"
+output: html_document
+---
+# Outlier
+```{r setup, include=FALSE}
+library(MASS)
+```
+
+```{r}
+hist(newcomb, breaks=50)
+```
+Two outliers.
+
+## Long tails and outliers(t-distribution)
+```{r}
+n = 16
+tsamp = matrix(rt(6*n,2), n, 6)
+hist(tsamp, breaks=50)
+```
