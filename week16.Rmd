@@ -16,7 +16,17 @@ Two outliers.
 
 ## Long tails and outliers(t-distribution)
 ```{r}
-n = 16
+n = 66
 tsamp = matrix(rt(6*n,2), n, 6)
 hist(tsamp, breaks=50)
+```
+
+## Robust odel
+$$ y_1, ... y_{66} | \mu, \sigma^2 \sim iid \  t_2(\mu, \sigma^2) $$
+$$ p(\mu) \propto 1 \ \ \ \ \  -\infty < \mu < \infty  $$
+$$ p(\sigma^2) \propto (\sigma^2)^{-1}  $$
+
+
+```{r}
+
 ```

@@ -4,6 +4,62 @@ author: "kwon"
 date: "2018년 9월 7일"
 output: html_document
 ---
+## Flint data
+### Read data
+```{r}
+Flintdata = read.csv("Flintdata.csv", row.names = 1)
+head(Flintdata)
+```
+
+### Visualize
+```{r}
+hist(Flintdata$FirstDraw)
+abline(v=15, col='red')
+```
+
+### Skewness
+```{r}
+summary(Flintdata$FirstDraw)
+summary(log(Flintdata$FirstDraw))
+hist(log(Flintdata$FirstDraw))
+abline(v=log(15), col='red')
+```
+
+## Sample statistic
+```{r}
+(n = nrow(Flintdata))
+(ybar = mean(log(Flintdata$FirstDraw)))
+(s.2 = var(log(Flintdata$FirstDraw)))
+```
+
+## Posterior
+```{r}
+sigma.2 = s.2
+mu0 = log(3)
+tau.2.0 = sigma.2
+
+# posterior mean
+(mun = (mu0/tau.2.0 + n*ybar/sigma.2) / (1/tau.2.0 +n/sigma.2))
+
+# posterior variance
+(tau.2.n = 1 / (1/tau.2.0 + n/sigma.2))
+```
+
+## Plot posterior
+```{r}
+# posterior density
+curve(dnorm(x, mun, sqrt(tau.2.n)), -1, 5, n=1000, ylab="Density")
+# prior density
+curve(dnorm(x, mu0, sqrt(tau.2.0)), -1, 5, add=TRUE, lty=2)
+```
+
+## Posterior interval
+```{r}
+(pci = mun+c(1, -1)*1.96*sqrt(tau.2.n))
+
+# original scale
+exp(pci)
+```
 
 ```{r}
 n = 200
