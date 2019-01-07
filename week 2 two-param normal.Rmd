@@ -1,0 +1,53 @@
+---
+title: "week2 two-param normal"
+author: "kwon"
+date: "2019년 1월 6일"
+output: html_document
+---
+
+# Two prameter normal sample
+## Conjugate prior
+```{r setup, include=FALSE}
+Flintdata = read.csv("Flintdata.csv", row.names = 1)
+head(Flintdata)
+```
+
+```{r}
+(n = nrow(Flintdata))
+(ybar = mean(log(Flintdata$FirstDraw)))
+(s.2 = var(log(Flintdata$FirstDraw)))
+```
+
+## Choose prior
+```{r}
+mu0 = log(3)
+sigma.2.0 = 1.17
+kappa0 = 1
+nu0 = 1
+```
+
+
+
+## Noninformative prior analysis
+```{r}
+post.sigma.2.sim = (n-1)*s.2/rchisq(1000, n-1)
+post.mu.sim = rnorm(1000, ybar, post.sigma.2.sim/n)
+
+quantile(post.sigma.2.sim, c(0.025, 0.975))
+quantile(post.mu.sim, c(0.025, 0.975))
+```
+
+## Posterior predictive distribution
+```{r}
+post.pred.sim = rnorm(1000, post.mu.sim, sqrt(post.sigma.2.sim))
+
+hist(post.pred.sim)
+abline(v=log(15), col="red")
+```
+
+## Posterior Probability
+```{r}
+mean(post.pred.sim>log(15))
+```
+
+
